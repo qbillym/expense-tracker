@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        input { padding: 10px; margin: 5px; font-size: 16px; }
+        a { display: inline-block; padding: 10px 20px; margin: 5px; background: #007bff; color: white; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>Complete Debug Test</h1>
+    
+    <div class="test">
+        <h3>1. JavaScript Test</h3>
+        <button onclick="document.getElementById('js-result').innerHTML='JavaScript WORKS!'">Test JavaScript</button>
+        <div id="js-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>2. Click Test</h3>
+        <button onmousedown="document.getElementById('click-result').innerHTML='MOUSE DOWN WORKS!'" onmouseup="document.getElementById('click-result').innerHTML='MOUSE UP WORKS!'">Test Click Events</button>
+        <div id="click-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>3. Form Test</h3>
+        <form onsubmit="document.getElementById('form-result').innerHTML='FORM SUBMISSION WORKS!'; return false;">
+            <input type="text" placeholder="Type something">
+            <button type="submit">Submit Form</button>
+        </form>
+        <div id="form-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>4. Link Test</h3>
+        <a href="javascript:document.getElementById('link-result').innerHTML='LINK CLICK WORKS!'">Test Link</a>
+        <div id="link-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>5. Browser Info</h3>
+        <script>
+            document.write('<p>User Agent: ' + navigator.userAgent + '</p>');
+            document.write('<p>JavaScript Enabled: Yes</p>');
+            document.write('<p>Cookies Enabled: ' + navigator.cookieEnabled + '</p>');
+            document.write('<p>Screen Resolution: ' + screen.width + 'x' + screen.height + '</p>');
+        </script>
+    </div>
+    
+    <div class="test">
+        <h3>6. Console Test</h3>
+        <p>Open browser console (F12) and look for any error messages</p>
+        <script>
+            console.log('Debug page loaded successfully');
+            console.log('Testing button functionality...');
+        </script>
+    </div>
+</body>
+</html>
