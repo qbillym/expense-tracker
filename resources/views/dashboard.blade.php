@@ -137,6 +137,161 @@
         0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
         40% { transform: scale(1); opacity: 1; }
     }
+
+    /* Fun Interactive Elements */
+    .fun-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: slideInRight 0.5s ease-out;
+    }
+
+    .fun-toast.good {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .fun-toast.warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .fun-toast.danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .budget-celebration {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10000;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 30px 50px;
+        border-radius: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: celebratePop 0.6s ease-out;
+    }
+
+    @keyframes celebratePop {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #fbbf24;
+        z-index: 9999;
+        animation: confettiFall 3s linear forwards;
+    }
+
+    @keyframes confettiFall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .target-history-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .target-history-item:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Enhanced Chart Animations */
+    canvas {
+        animation: fadeInScale 0.8s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Interactive hover effects */
+    .stats-card {
+        cursor: pointer;
+    }
+
+    .stats-card:active {
+        transform: translateY(-2px) scale(1.01);
+    }
+
+    /* AI Advice Styling */
+    #aiAdviceContent {
+        min-height: 120px;
+    }
+
+    #aiAdviceContent .badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    #aiAdviceContent li {
+        position: relative;
+        padding-left: 20px;
+    }
+
+    #aiAdviceContent li:before {
+        content: "💡";
+        position: absolute;
+        left: 0;
+    }
+
+    #aiAdviceContent strong {
+        color: #1f2937;
+        font-weight: 600;
+    }
 </style>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -194,37 +349,128 @@
         }
     @endphp
 
+    <!-- Spending Mood Indicator -->
+    <div class="card mb-4 border-info">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-emoji-smile me-2"></i>Your Spending Mood
+            </h5>
+        </div>
+        <div class="card-body text-center">
+            <div class="spending-mood-display">
+                @if($budgetActive)
+                    @if($user->isOverspending())
+                        <div class="mood-emoji display-1 mb-3">😰</div>
+                        <h6 class="text-danger">Wallet Panic Mode!</h6>
+                        <p class="text-muted">Your wallet is crying. Time for some financial first aid!</p>
+                    @elseif($budgetProgress >= 85)
+                        <div class="mood-emoji display-1 mb-3">😬</div>
+                        <h6 class="text-warning">Budget Anxiety</h6>
+                        <p class="text-muted">Getting close to the edge. Spend wisely, friend!</p>
+                    @elseif($budgetProgress >= 60)
+                        <div class="mood-emoji display-1 mb-3">😊</div>
+                        <h6 class="text-info">Happy Spending</h6>
+                        <p class="text-muted">You're doing great! Keep up the good work!</p>
+                    @else
+                        <div class="mood-emoji display-1 mb-3">🎉</div>
+                        <h6 class="text-success">Budget Champion!</h6>
+                        <p class="text-muted">You're crushing it! Financial ninja status unlocked!</p>
+                    @endif
+                @else
+                    <div class="mood-emoji display-1 mb-3">🤔</div>
+                    <h6 class="text-secondary">No Budget Set</h6>
+                    <p class="text-muted">Set a budget to unlock your spending mood!</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Stats -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="stats-card text-center">
+            <div class="stats-card text-center" onclick="animateCard(this)">
                 <i class="bi bi-receipt mb-2"></i>
                 <h2 class="mb-1">{{ $totalExpenses }}</h2>
                 <small>Total Expenses</small>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stats-card text-center">
+            <div class="stats-card text-center" onclick="animateCard(this)">
                 <i class="bi bi-cash mb-2"></i>
                 <h2 class="mb-1">{{ number_format($totalAmount, 0) }}</h2>
                 <small>Total Spent (RWF)</small>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stats-card text-center">
+            <div class="stats-card text-center" onclick="animateCard(this)">
                 <i class="bi bi-calendar-month mb-2"></i>
                 <h2 class="mb-1">{{ $thisMonthCount }}</h2>
                 <small>{{ now()->format('F') }} Expenses</small>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="stats-card text-center">
+            <div class="stats-card text-center" onclick="animateCard(this)">
                 <i class="bi bi-graph-up mb-2"></i>
                 <h2 class="mb-1">{{ number_format($thisMonthAmount, 0) }}</h2>
                 <small>{{ now()->format('F') }} Spend (RWF)</small>
             </div>
         </div>
     </div>
+
+    <!-- Budget Creation Form (when no active budget) -->
+    @if(!$budgetActive)
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-bullseye me-2"></i>Create Your Budget Target
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('budget.store') }}" class="row g-3">
+                @csrf
+                <div class="col-md-6">
+                    <label for="target_amount" class="form-label">
+                        <i class="bi bi-cash-stack me-1"></i>Target Amount (RWF)
+                    </label>
+                    <input type="number" 
+                           class="form-control form-control-lg" 
+                           id="target_amount" 
+                           name="target_amount" 
+                           placeholder="50000"
+                           min="1" 
+                           max="10000000" 
+                           required>
+                    <div class="form-text">Set your spending limit for this period</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="duration_days" class="form-label">
+                        <i class="bi bi-calendar-range me-1"></i>Duration
+                    </label>
+                    <select class="form-select form-select-lg" id="duration_days" name="duration_days" required>
+                        <option value="">Select duration</option>
+                        <option value="7">1 Week (7 days)</option>
+                        <option value="14">2 Weeks (14 days)</option>
+                        <option value="30" selected>1 Month (30 days)</option>
+                        <option value="60">2 Months (60 days)</option>
+                        <option value="90">3 Months (90 days)</option>
+                    </select>
+                    <div class="form-text">Choose your budget period</div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Budget Challenge
+                    </button>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            Setting a budget helps you track spending and achieve financial goals!
+                        </small>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 
     <!-- Budget Status -->
     @if($budgetActive)
@@ -345,6 +591,38 @@
                 </div>
             </div>
         </div>
+    @endif
+
+    <!-- AI Advice Section -->
+    @if($budgetActive)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-robot me-2"></i>AI Financial Advisor
+                    </h5>
+                    <button onclick="loadAIAdvice()" class="btn btn-sm btn-light">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Advice
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="aiAdviceLoading" class="text-center py-4" style="display: none;">
+                        <div class="ai-thinking"></div>
+                        <div class="ai-thinking"></div>
+                        <div class="ai-thinking"></div>
+                        <div class="mt-2 text-muted">AI is analyzing your spending patterns...</div>
+                    </div>
+                    <div id="aiAdviceContent" class="animate-fade-in">
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-cpu display-4 mb-3"></i>
+                            <p>Click "Refresh Advice" to get personalized financial insights</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
 
     <!-- Recent Expenses -->
@@ -474,6 +752,33 @@
             setTimeout(() => {
                 adviceContent.classList.remove('animate-fade-in');
             }, 600);
+        }
+
+        function animateCard(card) {
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 200);
+            
+            // Create a fun number animation
+            const number = card.querySelector('h2');
+            const originalText = number.textContent;
+            const originalValue = parseInt(originalText.replace(/[^0-9]/g, ''));
+            
+            if (originalValue) {
+                let current = 0;
+                const increment = originalValue / 20;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= originalValue) {
+                        current = originalValue;
+                        clearInterval(timer);
+                    }
+                    number.textContent = originalText.includes('RWF') ? 
+                        'RWF ' + Math.floor(current).toLocaleString() : 
+                        Math.floor(current).toLocaleString();
+                }, 50);
+            }
         }
 
         function showBudgetToast(message, level = 'good', icon = 'bi-emoji-laughing') {
