@@ -349,42 +349,6 @@
         }
     @endphp
 
-    <!-- Spending Mood Indicator -->
-    <div class="card mb-4 border-info">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-emoji-smile me-2"></i>Your Spending Mood
-            </h5>
-        </div>
-        <div class="card-body text-center">
-            <div class="spending-mood-display">
-                @if($budgetActive)
-                    @if($user->isOverspending())
-                        <div class="mood-emoji display-1 mb-3">😰</div>
-                        <h6 class="text-danger">Wallet Panic Mode!</h6>
-                        <p class="text-muted">Your wallet is crying. Time for some financial first aid!</p>
-                    @elseif($budgetProgress >= 85)
-                        <div class="mood-emoji display-1 mb-3">😬</div>
-                        <h6 class="text-warning">Budget Anxiety</h6>
-                        <p class="text-muted">Getting close to the edge. Spend wisely, friend!</p>
-                    @elseif($budgetProgress >= 60)
-                        <div class="mood-emoji display-1 mb-3">😊</div>
-                        <h6 class="text-info">Happy Spending</h6>
-                        <p class="text-muted">You're doing great! Keep up the good work!</p>
-                    @else
-                        <div class="mood-emoji display-1 mb-3">🎉</div>
-                        <h6 class="text-success">Budget Champion!</h6>
-                        <p class="text-muted">You're crushing it! Financial ninja status unlocked!</p>
-                    @endif
-                @else
-                    <div class="mood-emoji display-1 mb-3">🤔</div>
-                    <h6 class="text-secondary">No Budget Set</h6>
-                    <p class="text-muted">Set a budget to unlock your spending mood!</p>
-                @endif
-            </div>
-        </div>
-    </div>
-
     <!-- Quick Stats -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
@@ -417,114 +381,111 @@
         </div>
     </div>
 
-    <!-- Budget Creation Form (when no active budget) -->
-    @if(!$budgetActive)
-    <div class="card mb-4 border-primary">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-bullseye me-2"></i>Create Your Budget Target
-            </h5>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ route('budget.store') }}" class="row g-3">
-                @csrf
-                <div class="col-md-6">
-                    <label for="target_amount" class="form-label">
-                        <i class="bi bi-cash-stack me-1"></i>Target Amount (RWF)
-                    </label>
-                    <input type="number" 
-                           class="form-control form-control-lg" 
-                           id="target_amount" 
-                           name="target_amount" 
-                           placeholder="50000"
-                           min="1" 
-                           max="10000000" 
-                           required>
-                    <div class="form-text">Set your spending limit for this period</div>
-                </div>
-                <div class="col-md-6">
-                    <label for="duration_days" class="form-label">
-                        <i class="bi bi-calendar-range me-1"></i>Duration
-                    </label>
-                    <select class="form-select form-select-lg" id="duration_days" name="duration_days" required>
-                        <option value="">Select duration</option>
-                        <option value="7">1 Week (7 days)</option>
-                        <option value="14">2 Weeks (14 days)</option>
-                        <option value="30" selected>1 Month (30 days)</option>
-                        <option value="60">2 Months (60 days)</option>
-                        <option value="90">3 Months (90 days)</option>
-                    </select>
-                    <div class="form-text">Choose your budget period</div>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-rocket-takeoff me-2"></i>Start Budget Challenge
-                    </button>
-                    <div class="mt-2">
-                        <small class="text-muted">
-                            <i class="bi bi-lightbulb me-1"></i>
-                            Setting a budget helps you track spending and achieve financial goals!
-                        </small>
+    <!-- Main Content Row -->
+<div class="row">
+    <!-- Left Column - Main Content -->
+    <div class="col-lg-8">
+        <!-- Budget Creation Form (when no active budget) -->
+        @if(!$budgetActive)
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-bullseye me-2"></i>Create Your Budget Target
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ route('budget.store') }}" class="row g-3">
+                    @csrf
+                    <div class="col-md-6">
+                        <label for="target_amount" class="form-label">
+                            <i class="bi bi-cash-stack me-1"></i>Target Amount (RWF)
+                        </label>
+                        <input type="number" 
+                               class="form-control form-control-lg" 
+                               id="target_amount" 
+                               name="target_amount" 
+                               placeholder="50000"
+                               min="1" 
+                               max="10000000" 
+                               required>
+                        <div class="form-text">Set your spending limit for this period</div>
                     </div>
-                </div>
-            </form>
+                    <div class="col-md-6">
+                        <label for="duration_days" class="form-label">
+                            <i class="bi bi-calendar-range me-1"></i>Duration
+                        </label>
+                        <select class="form-select form-select-lg" id="duration_days" name="duration_days" required>
+                            <option value="">Select duration</option>
+                            <option value="7">1 Week (7 days)</option>
+                            <option value="14">2 Weeks (14 days)</option>
+                            <option value="30" selected>1 Month (30 days)</option>
+                            <option value="60">2 Months (60 days)</option>
+                            <option value="90">3 Months (90 days)</option>
+                        </select>
+                        <div class="form-text">Choose your budget period</div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Start Budget Challenge
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    @endif
+        @endif
 
-    <!-- Budget Status -->
-    @if($budgetActive)
-    <div class="card mb-4 border-{{ $user->isOverspending() ? 'danger' : 'success' }}">
-        <div class="card-header bg-{{ $user->isOverspending() ? 'danger' : 'success' }} text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-{{ $user->isOverspending() ? 'exclamation-triangle' : 'check-circle' }} me-2"></i>
-                Budget Status: {{ $user->isOverspending() ? 'Over Budget' : 'On Track' }}
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Progress</span>
-                        <span class="fw-bold">{{ $budgetProgress }}%</span>
-                    </div>
-                    <div class="progress mb-3">
-                        <div class="progress-bar {{ $user->isOverspending() ? 'bg-danger' : 'bg-success' }}" 
-                             style="width: {{ min(100, $budgetProgress) }}%">
+        <!-- Budget Status -->
+        @if($budgetActive)
+        <div class="card mb-4 border-{{ $user->isOverspending() ? 'danger' : 'success' }}">
+            <div class="card-header bg-{{ $user->isOverspending() ? 'danger' : 'success' }} text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-{{ $user->isOverspending() ? 'exclamation-triangle' : 'check-circle' }} me-2"></i>
+                    Budget Status: {{ $user->isOverspending() ? 'Over Budget' : 'On Track' }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Progress</span>
+                            <span class="fw-bold">{{ $budgetProgress }}%</span>
                         </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <small class="text-muted">Target</small>
-                            <div class="fw-bold">RWF {{ number_format($activeTarget->target_amount, 0) }}</div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar {{ $user->isOverspending() ? 'bg-danger' : 'bg-success' }}" 
+                                 style="width: {{ min(100, $budgetProgress) }}%">
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <small class="text-muted">Spent</small>
-                            <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">RWF {{ number_format($budgetSpent, 0) }}</div>
-                        </div>
-                        <div class="col-4">
-                            <small class="text-muted">{{ $user->isOverspending() ? 'Over' : 'Remaining' }}</small>
-                            <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">
-                                RWF {{ number_format($budgetRemaining, 0) }}
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <small class="text-muted">Target</small>
+                                <div class="fw-bold">RWF {{ number_format($activeTarget->target_amount, 0) }}</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Spent</small>
+                                <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">RWF {{ number_format($budgetSpent, 0) }}</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">{{ $user->isOverspending() ? 'Over' : 'Remaining' }}</small>
+                                <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">
+                                    RWF {{ number_format($budgetRemaining, 0) }}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-calendar-event fs-1 text-primary"></i>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-calendar-event fs-1 text-primary"></i>
+                        </div>
+                        <h6 class="mb-1">{{ $user->budgetDaysRemaining() }} days left</h6>
+                        <small class="text-muted">{{ $activeTarget->start_date->format('M d') }} - {{ $activeTarget->end_date->format('M d') }}</small>
                     </div>
-                    <h6 class="mb-1">{{ $user->budgetDaysRemaining() }} days left</h6>
-                    <small class="text-muted">{{ $activeTarget->start_date->format('M d') }} - {{ $activeTarget->end_date->format('M d') }}</small>
                 </div>
             </div>
         </div>
-    </div>
-    @endif
+        @endif
 
-    
-    
-    @if($budgetActive)
+        <!-- Charts Row -->
+        @if($budgetActive)
         <div class="row mb-4">
             <div class="col-lg-6">
                 <div class="card">
@@ -550,128 +511,180 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-archive me-2"></i>Completed Targets (Locked)</h5>
-                        <span class="badge bg-secondary">{{ $completedTargets->count() }} archived</span>
-                    </div>
-                    <div class="card-body">
-                        @if($completedTargets->isEmpty())
-                            <small class="text-muted">No completed targets yet.</small>
-                        @else
-                            <div class="row g-2">
-                                @foreach($completedTargets as $target)
-                                    <div class="col-md-6">
-                                        <div class="target-history-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <div class="fw-semibold">RWF {{ number_format($target->target_amount, 0) }}</div>
-                                                    <small class="text-muted">{{ $target->start_date->format('M d') }} - {{ $target->end_date->format('M d, Y') }}</small>
-                                                </div>
-                                                <span class="badge bg-success">Completed</span>
-                                            </div>
-                                            <div class="btn-group w-100 mt-2" role="group">
-                                                <a href="{{ route('reports.target', ['target' => $target, 'format' => 'pdf']) }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-file-earmark-pdf me-1"></i>PDF
-                                                </a>
-                                                <a href="{{ route('reports.target', ['target' => $target, 'format' => 'excel']) }}" class="btn btn-sm btn-outline-success">
-                                                    <i class="bi bi-file-earmark-spreadsheet me-1"></i>Excel
-                                                </a>
-                                                <a href="{{ route('reports.target', ['target' => $target, 'format' => 'csv']) }}" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="bi bi-file-earmark-text me-1"></i>CSV
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+        </div>
+        @endif
+
+        <!-- Recent Expenses -->
+        @if($recentExpenses->isNotEmpty())
+            <div class="card animate-fade-in">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Recent Expenses
+                    </h5>
+                    <a href="{{ route('expenses.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    @foreach($recentExpenses as $expense)
+                        <div class="d-flex align-items-center p-4 border-bottom expense-item animate-fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s;">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h6 class="mb-0 me-3 fw-semibold">{{ $expense->title }}</h6>
+                                    <span class="badge bg-{{ $expense->getCategoryColor() }} category-badge">
+                                        {{ $expense->category }}
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <span class="me-3">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ $expense->date->format('M d, Y') }}
+                                    </span>
+                                    <span class="me-3 fw-semibold text-success">
+                                        <i class="bi bi-cash-stack me-1"></i>{{ $expense->getFormattedAmount() }}
+                                    </span>
+                                    @if($expense->mobile_money_message)
+                                        <span class="badge bg-light text-dark">
+                                            <i class="bi bi-phone me-1"></i>Mobile Money
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                        @endif
+                            <div class="text-end">
+                                <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+
+    <!-- Right Column - AI Advice & Reports -->
+    <div class="col-lg-4">
+        <!-- AI Advice Section -->
+        @if($budgetActive)
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-robot me-2"></i>AI Advisor
+                </h5>
+                <button onclick="loadAIAdvice()" class="btn btn-sm btn-light">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            <div class="card-body" style="min-height: 250px;">
+                <div id="aiAdviceLoading" class="text-center py-4" style="display: none;">
+                    <div class="ai-thinking"></div>
+                    <div class="ai-thinking"></div>
+                    <div class="ai-thinking"></div>
+                    <div class="mt-2 text-muted">AI is analyzing...</div>
+                </div>
+                <div id="aiAdviceContent" class="animate-fade-in">
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-cpu display-4 mb-3"></i>
+                        <p>Click refresh for insights</p>
                     </div>
                 </div>
             </div>
         </div>
-    @endif
+        @endif
 
-    <!-- AI Advice Section -->
-    @if($budgetActive)
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-robot me-2"></i>AI Financial Advisor
-                    </h5>
-                    <button onclick="loadAIAdvice()" class="btn btn-sm btn-light">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Advice
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div id="aiAdviceLoading" class="text-center py-4" style="display: none;">
-                        <div class="ai-thinking"></div>
-                        <div class="ai-thinking"></div>
-                        <div class="ai-thinking"></div>
-                        <div class="mt-2 text-muted">AI is analyzing your spending patterns...</div>
-                    </div>
-                    <div id="aiAdviceContent" class="animate-fade-in">
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-cpu display-4 mb-3"></i>
-                            <p>Click "Refresh Advice" to get personalized financial insights</p>
-                        </div>
-                    </div>
+        <!-- Spending Mood Indicator -->
+        <div class="card mb-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-emoji-smile me-2"></i>Spending Mood
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                @if($budgetActive)
+                    @if($user->isOverspending())
+                        <div class="mood-emoji display-4 mb-2">😰</div>
+                        <h6 class="text-danger">Wallet Panic!</h6>
+                    @elseif($budgetProgress >= 85)
+                        <div class="mood-emoji display-4 mb-2">😬</div>
+                        <h6 class="text-warning">Budget Anxiety</h6>
+                    @elseif($budgetProgress >= 60)
+                        <div class="mood-emoji display-4 mb-2">😊</div>
+                        <h6 class="text-info">Happy Spending</h6>
+                    @else
+                        <div class="mood-emoji display-4 mb-2">🎉</div>
+                        <h6 class="text-success">Budget Champion!</h6>
+                    @endif
+                @else
+                    <div class="mood-emoji display-4 mb-2">🤔</div>
+                    <h6 class="text-secondary">No Budget Set</h6>
+                @endif
+            </div>
+        </div>
+
+        <!-- Quick Reports -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-download me-2"></i>Quick Reports
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ route('reports.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-file-earmark-text me-2"></i>View All Reports
+                    </a>
+                    @if($budgetActive)
+                    <a href="{{ route('reports.target', ['target' => $activeTarget, 'format' => 'pdf']) }}" class="btn btn-outline-danger">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF Report
+                    </a>
+                    <a href="{{ route('reports.target', ['target' => $activeTarget, 'format' => 'excel']) }}" class="btn btn-outline-success">
+                        <i class="bi bi-file-earmark-excel me-2"></i>Download Excel Report
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-    @endif
+</div>
 
-    <!-- Recent Expenses -->
-    @if($recentExpenses->isNotEmpty())
-        <div class="row">
-            <div class="col-12">
-                <div class="card animate-fade-in">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-clock-history me-2"></i>Recent Expenses
-                        </h5>
-                        <a href="{{ route('expenses.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
-                    <div class="card-body p-0">
-                        @foreach($recentExpenses as $expense)
-                            <div class="d-flex align-items-center p-4 border-bottom expense-item animate-fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s;">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="mb-0 me-3 fw-semibold">{{ $expense->title }}</h6>
-                                        <span class="badge bg-{{ $expense->getCategoryColor() }} category-badge">
-                                            {{ $expense->category }}
-                                        </span>
+<!-- Completed Targets Section -->
+@if($budgetActive && $completedTargets->isNotEmpty())
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-archive me-2"></i>Completed Targets</h5>
+                <span class="badge bg-secondary">{{ $completedTargets->count() }} archived</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    @foreach($completedTargets as $target)
+                        <div class="col-md-6">
+                            <div class="target-history-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fw-semibold">RWF {{ number_format($target->target_amount, 0) }}</div>
+                                        <small class="text-muted">{{ $target->start_date->format('M d') }} - {{ $target->end_date->format('M d, Y') }}</small>
                                     </div>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <span class="me-3">
-                                            <i class="bi bi-calendar3 me-1"></i>{{ $expense->date->format('M d, Y') }}
-                                        </span>
-                                        <span class="me-3 fw-semibold text-success">
-                                            <i class="bi bi-cash-stack me-1"></i>{{ $expense->getFormattedAmount() }}
-                                        </span>
-                                        @if($expense->mobile_money_message)
-                                            <span class="badge bg-light text-dark">
-                                                <i class="bi bi-phone me-1"></i>Mobile Money
-                                            </span>
-                                        @endif
-                                    </div>
+                                    <span class="badge bg-success">Completed</span>
                                 </div>
-                                <div class="text-end">
-                                    <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
+                                <div class="btn-group w-100 mt-2" role="group">
+                                    <a href="{{ route('reports.target', ['target' => $target, 'format' => 'pdf']) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+                                    </a>
+                                    <a href="{{ route('reports.target', ['target' => $target, 'format' => 'excel']) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>Excel
+                                    </a>
+                                    <a href="{{ route('reports.target', ['target' => $target, 'format' => 'csv']) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-file-earmark-text me-1"></i>CSV
                                     </a>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
-    @endif
+    </div>
+</div>
+@endif
 
     <script>
         // Load AI Advice Function
