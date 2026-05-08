@@ -55,9 +55,7 @@ Route::middleware('auth')->group(function () {
     // Monthly Reports
     Route::get('/reports/monthly', [ReportController::class, 'downloadMonthlyReport'])->name('reports.monthly');
 
-    Route::get('dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('budget', function (Request $request) {
         $user = auth()->user();
