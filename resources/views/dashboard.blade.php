@@ -315,12 +315,12 @@
         $recentExpenses = $userExpenses->sortByDesc('date')->take(5);
 
         $budgetActive = $activeTarget !== null;
-        $budgetSpent = $budgetActive ? $user->budgetSpent() : 0;
-        $budgetRemaining = $budgetActive ? $user->budgetRemaining() : 0;
-        $budgetProgress = $budgetActive ? $user->budgetProgressPercent() : 0;
-        $budgetTopCategory = $budgetActive ? $user->budgetTopCategory() : null;
-        $budgetTargetReached = $budgetActive && $budgetSpent >= $activeTarget->target_amount;
-        $budgetDurationDays = $budgetActive ? max(1, $activeTarget->start_date->diffInDays($activeTarget->end_date)) : 1;
+        $budgetSpent = 0;
+        $budgetRemaining = 0;
+        $budgetProgress = 0;
+        $budgetTopCategory = null;
+        $budgetTargetReached = false;
+        $budgetDurationDays = 1;
         $budgetCategories = collect();
         $budgetChartLabels = [];
         $budgetChartValues = [];
@@ -328,24 +328,39 @@
         $budgetFunnyMessage = 'Wallet check: smooth ride. Keep up the discipline!';
 
         if ($budgetActive) {
-            if ($user->isOverspending()) {
-                $budgetTone = 'danger';
-                $budgetFunnyMessage = 'Red alert: your wallet just screamed "plot twist!" Time to slow down.';
-            } elseif ($budgetProgress >= 85 || $user->budgetDaysRemaining() <= 3) {
-                $budgetTone = 'warning';
-                $budgetFunnyMessage = 'Careful mode: almost at the edge. Every franc now has a mission.';
-            } else {
-                $budgetTone = 'good';
-                $budgetFunnyMessage = 'Nice! You are outsmarting overspending like a budget ninja.';
-            }
-        }
+            try {
+                $budgetSpent = $user->budgetSpent();
+                $budgetRemaining = $user->budgetRemaining();
+                $budgetProgress = $user->budgetProgressPercent();
+                $budgetTopCategory = $user->budgetTopCategory();
+                $budgetTargetReached = $budgetSpent >= $activeTarget->target_amount;
+                $budgetDurationDays = max(1, $activeTarget->start_date->diffInDays($activeTarget->end_date));
+                
+                if ($user->isOverspending()) {
+                    $budgetTone = 'danger';
+                    $budgetFunnyMessage = 'Red alert: your wallet just screamed "plot twist!" Time to slow down.';
+                } elseif ($budgetProgress >= 85 || $user->budgetDaysRemaining() <= 3) {
+                    $budgetTone = 'warning';
+                    $budgetFunnyMessage = 'Careful mode: almost at the edge. Every franc now has a mission.';
+                } else {
+                    $budgetTone = 'good';
+                    $budgetFunnyMessage = 'Nice! You are outsmarting overspending like a budget ninja.';
+                }
 
-        if ($budgetActive) {
-            $budgetCategories = $user->budgetPeriodExpenses()->groupBy('category')->map(function ($group) {
-                return $group->sum('amount');
-            })->sortDesc();
-            $budgetChartLabels = $budgetCategories->keys()->all();
-            $budgetChartValues = $budgetCategories->values()->map(fn($value) => (float) $value)->all();
+                $budgetCategories = $user->budgetPeriodExpenses()->groupBy('category')->map(function ($group) {
+                    return $group->sum('amount');
+                })->sortDesc();
+                $budgetChartLabels = $budgetCategories->keys()->all();
+                $budgetChartValues = $budgetCategories->values()->map(fn($value) => (float) $value)->all();
+            } catch (\Exception $e) {
+                // If there's any error with budget calculations, set safe defaults
+                $budgetActive = false;
+                $budgetSpent = 0;
+                $budgetRemaining = 0;
+                $budgetProgress = 0;
+                $budgetChartLabels = [];
+                $budgetChartValues = [];
+            }
         }
     @endphp
 

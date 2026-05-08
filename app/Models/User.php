@@ -153,21 +153,29 @@ class User extends Authenticatable
 
     public function budgetDaysRemaining(): int
     {
-        if (!$this->hasActiveBudget()) {
+        try {
+            if (!$this->hasActiveBudget()) {
+                return 0;
+            }
+
+            return now()->diffInDays($this->activeBudgetTarget()->end_date, false);
+        } catch (\Exception $e) {
             return 0;
         }
-
-        return now()->diffInDays($this->activeBudgetTarget()->end_date, false);
     }
 
     public function budgetDaysElapsed(): int
     {
-        $activeTarget = $this->activeBudgetTarget();
-        if (!$activeTarget) {
+        try {
+            $activeTarget = $this->activeBudgetTarget();
+            if (!$activeTarget) {
+                return 0;
+            }
+
+            return $activeTarget->start_date->diffInDays(now(), false);
+        } catch (\Exception $e) {
             return 0;
         }
-
-        return $activeTarget->start_date->diffInDays(now(), false);
     }
 
     public function budgetTotalDays(): int
@@ -182,12 +190,16 @@ class User extends Authenticatable
 
     public function isOverspending(): bool
     {
-        if (!$this->hasActiveBudget()) {
+        try {
+            if (!$this->hasActiveBudget()) {
+                return false;
+            }
+            
+            $activeTarget = $this->activeBudgetTarget();
+            return $activeTarget ? $this->budgetSpent() > $activeTarget->target_amount : false;
+        } catch (\Exception $e) {
             return false;
         }
-        
-        $activeTarget = $this->activeBudgetTarget();
-        return $activeTarget ? $this->budgetSpent() > $activeTarget->target_amount : false;
     }
 
     public function dailyAverageSpending(): float
@@ -222,49 +234,69 @@ class User extends Authenticatable
 
     public function budgetPeriodExpenses()
     {
-        $activeTarget = $this->activeBudgetTarget();
-        if (! $activeTarget) {
+        try {
+            $activeTarget = $this->activeBudgetTarget();
+            if (! $activeTarget) {
+                return collect();
+            }
+
+            return $this->expenses()
+                ->whereBetween('date', [$activeTarget->start_date->toDateString(), $activeTarget->end_date->toDateString()])
+                ->get();
+        } catch (\Exception $e) {
             return collect();
         }
-
-        return $this->expenses()
-            ->whereBetween('date', [$activeTarget->start_date->toDateString(), $activeTarget->end_date->toDateString()])
-            ->get();
     }
 
     public function budgetSpent(): float
     {
-        return $this->budgetPeriodExpenses()->sum('amount');
+        try {
+            return $this->budgetPeriodExpenses()->sum('amount');
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 
     public function budgetRemaining(): float
     {
-        $activeTarget = $this->activeBudgetTarget();
-        $targetAmount = $activeTarget ? (float) $activeTarget->target_amount : 0;
-        return max(0, $targetAmount - $this->budgetSpent());
+        try {
+            $activeTarget = $this->activeBudgetTarget();
+            $targetAmount = $activeTarget ? (float) $activeTarget->target_amount : 0;
+            return max(0, $targetAmount - $this->budgetSpent());
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 
     public function budgetProgressPercent(): int
     {
-        $activeTarget = $this->activeBudgetTarget();
-        if (! $activeTarget || $activeTarget->target_amount <= 0) {
+        try {
+            $activeTarget = $this->activeBudgetTarget();
+            if (! $activeTarget || $activeTarget->target_amount <= 0) {
+                return 0;
+            }
+
+            return min(100, (int) round(($this->budgetSpent() / $activeTarget->target_amount) * 100));
+        } catch (\Exception $e) {
             return 0;
         }
-
-        return min(100, (int) round(($this->budgetSpent() / $activeTarget->target_amount) * 100));
     }
 
     public function budgetTopCategory(): ?string
     {
-        $categoryTotals = $this->budgetPeriodExpenses()->groupBy('category')->map(function ($group) {
-            return $group->sum('amount');
-        });
+        try {
+            $categoryTotals = $this->budgetPeriodExpenses()->groupBy('category')->map(function ($group) {
+                return $group->sum('amount');
+            });
 
-        if ($categoryTotals->isEmpty()) {
+            if ($categoryTotals->isEmpty()) {
+                return null;
+            }
+
+            return $categoryTotals->sortDesc()->keys()->first();
+        } catch (\Exception $e) {
             return null;
         }
-
-        return $categoryTotals->sortDesc()->keys()->first();
     }
 
     public function expenses()
