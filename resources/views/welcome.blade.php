@@ -565,7 +565,7 @@
                 <div class="col-12 text-center">
                     <p class="mb-0">
                         <i class="bi bi-copyright me-1"></i>
-                        {{ date('Y') }} Expense Tracker. Built with Laravel & Bootstrap.
+                        {{ date('Y') }} Expense Tracker@2026.
                     </p>
                 </div>
             </div>
