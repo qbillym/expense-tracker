@@ -13,6 +13,50 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Simple test route
+Route::get('/test', function () {
+    return response()->json([
+        'status' => 'working',
+        'timestamp' => now(),
+        'environment' => app()->environment()
+    ]);
+});
+
+// Test route to bypass authentication and test dashboard
+Route::get('/test-dashboard', function () {
+    try {
+        // Create a test user
+        $testUser = \App\Models\User::create([
+            'name' => 'Test User',
+            'email' => 'test' . time() . '@example.com',
+            'password' => \Hash::make('password123'),
+        ]);
+        
+        // Log in the test user
+        auth()->login($testUser);
+        
+        // Try to load the dashboard controller
+        $controller = new \App\Http\Controllers\DashboardController();
+        $response = $controller->index(request());
+        
+        // Clean up
+        auth()->logout();
+        $testUser->delete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dashboard controller works without authentication issues'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Debug route to test database and identify issues
 Route::get('/debug', function () {
     try {
