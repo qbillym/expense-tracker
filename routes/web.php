@@ -13,6 +13,54 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Debug route to test database and identify issues
+Route::get('/debug', function () {
+    try {
+        $debug = [
+            'environment' => app()->environment(),
+            'database_connection' => config('database.default'),
+            'database_host' => config('database.connections.' . config('database.default') . '.host'),
+            'database_name' => config('database.connections.' . config('database.default') . '.database'),
+            'database_status' => 'connected',
+            'tables' => [],
+        ];
+        
+        // Test database connection
+        try {
+            $tables = \DB::select("SHOW TABLES");
+            foreach ($tables as $table) {
+                foreach ($table as $value) {
+                    $debug['tables'][] = $value;
+                }
+            }
+        } catch (\Exception $e) {
+            $debug['database_status'] = 'error: ' . $e->getMessage();
+        }
+        
+        // Test user creation
+        try {
+            $testUser = [
+                'name' => 'Debug Test',
+                'email' => 'debug' . time() . '@test.com',
+                'password' => \Hash::make('password123'),
+            ];
+            
+            $user = \App\Models\User::create($testUser);
+            $debug['user_creation'] = 'success: ' . $user->id;
+            $user->delete(); // Clean up
+        } catch (\Exception $e) {
+            $debug['user_creation'] = 'error: ' . $e->getMessage();
+        }
+        
+        return response()->json($debug);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [AuthController::class, 'register'])->name('register.perform');
