@@ -301,68 +301,13 @@
     </div>
 </div>
 
-    @php
-        $user = auth()->user();
-        $user->refreshBudgetLocks();
-        $activeTarget = $user->activeBudgetTarget();
-        $completedTargets = $user->completedBudgetTargets()->take(5)->get();
-        $userExpenses = $user->expenses;
-        $totalExpenses = $userExpenses->count();
-        $totalAmount = $userExpenses->sum('amount');
-        $thisMonthExpenses = $userExpenses->where('date', '>=', now()->startOfMonth());
-        $thisMonthCount = $thisMonthExpenses->count();
-        $thisMonthAmount = $thisMonthExpenses->sum('amount');
-        $recentExpenses = $userExpenses->sortByDesc('date')->take(5);
-
-        $budgetActive = $activeTarget !== null;
-        $budgetSpent = 0;
-        $budgetRemaining = 0;
-        $budgetProgress = 0;
-        $budgetTopCategory = null;
-        $budgetTargetReached = false;
-        $budgetDurationDays = 1;
-        $budgetCategories = collect();
-        $budgetChartLabels = [];
-        $budgetChartValues = [];
-        $budgetTone = 'good';
-        $budgetFunnyMessage = 'Wallet check: smooth ride. Keep up the discipline!';
-
-        if ($budgetActive) {
-            try {
-                $budgetSpent = $user->budgetSpent();
-                $budgetRemaining = $user->budgetRemaining();
-                $budgetProgress = $user->budgetProgressPercent();
-                $budgetTopCategory = $user->budgetTopCategory();
-                $budgetTargetReached = $budgetSpent >= $activeTarget->target_amount;
-                $budgetDurationDays = max(1, $activeTarget->start_date->diffInDays($activeTarget->end_date));
-                
-                if ($user->isOverspending()) {
-                    $budgetTone = 'danger';
-                    $budgetFunnyMessage = 'Red alert: your wallet just screamed "plot twist!" Time to slow down.';
-                } elseif ($budgetProgress >= 85 || $user->budgetDaysRemaining() <= 3) {
-                    $budgetTone = 'warning';
-                    $budgetFunnyMessage = 'Careful mode: almost at the edge. Every franc now has a mission.';
-                } else {
-                    $budgetTone = 'good';
-                    $budgetFunnyMessage = 'Nice! You are outsmarting overspending like a budget ninja.';
-                }
-
-                $budgetCategories = $user->budgetPeriodExpenses()->groupBy('category')->map(function ($group) {
-                    return $group->sum('amount');
-                })->sortDesc();
-                $budgetChartLabels = $budgetCategories->keys()->all();
-                $budgetChartValues = $budgetCategories->values()->map(fn($value) => (float) $value)->all();
-            } catch (\Exception $e) {
-                // If there's any error with budget calculations, set safe defaults
-                $budgetActive = false;
-                $budgetSpent = 0;
-                $budgetRemaining = 0;
-                $budgetProgress = 0;
-                $budgetChartLabels = [];
-                $budgetChartValues = [];
-            }
-        }
-    @endphp
+    <!-- Error message display -->
+    @if(isset($error))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>{{ $error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     <!-- Quick Stats -->
     <div class="row mb-4">
@@ -451,11 +396,11 @@
 
         <!-- Budget Status -->
         @if($budgetActive)
-        <div class="card mb-4 border-{{ $user->isOverspending() ? 'danger' : 'success' }}">
-            <div class="card-header bg-{{ $user->isOverspending() ? 'danger' : 'success' }} text-white">
+        <div class="card mb-4 border-{{ $budgetTone === 'danger' ? 'danger' : 'success' }}">
+            <div class="card-header bg-{{ $budgetTone === 'danger' ? 'danger' : 'success' }} text-white">
                 <h5 class="mb-0">
-                    <i class="bi bi-{{ $user->isOverspending() ? 'exclamation-triangle' : 'check-circle' }} me-2"></i>
-                    Budget Status: {{ $user->isOverspending() ? 'Over Budget' : 'On Track' }}
+                    <i class="bi bi-{{ $budgetTone === 'danger' ? 'exclamation-triangle' : 'check-circle' }} me-2"></i>
+                    Budget Status: {{ $budgetTone === 'danger' ? 'Over Budget' : 'On Track' }}
                 </h5>
             </div>
             <div class="card-body">
@@ -466,7 +411,7 @@
                             <span class="fw-bold">{{ $budgetProgress }}%</span>
                         </div>
                         <div class="progress mb-3">
-                            <div class="progress-bar {{ $user->isOverspending() ? 'bg-danger' : 'bg-success' }}" 
+                            <div class="progress-bar {{ $budgetTone === 'danger' ? 'bg-danger' : 'bg-success' }}" 
                                  style="width: {{ min(100, $budgetProgress) }}%">
                             </div>
                         </div>
@@ -477,11 +422,11 @@
                             </div>
                             <div class="col-4">
                                 <small class="text-muted">Spent</small>
-                                <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">RWF {{ number_format($budgetSpent, 0) }}</div>
+                                <div class="fw-bold {{ $budgetTone === 'danger' ? 'text-danger' : 'text-success' }}">RWF {{ number_format($budgetSpent, 0) }}</div>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">{{ $user->isOverspending() ? 'Over' : 'Remaining' }}</small>
-                                <div class="fw-bold {{ $user->isOverspending() ? 'text-danger' : 'text-success' }}">
+                                <small class="text-muted">{{ $budgetTone === 'danger' ? 'Over' : 'Remaining' }}</small>
+                                <div class="fw-bold {{ $budgetTone === 'danger' ? 'text-danger' : 'text-success' }}">
                                     RWF {{ number_format($budgetRemaining, 0) }}
                                 </div>
                             </div>
@@ -491,7 +436,7 @@
                         <div class="mb-3">
                             <i class="bi bi-calendar-event fs-1 text-primary"></i>
                         </div>
-                        <h6 class="mb-1">{{ $user->budgetDaysRemaining() }} days left</h6>
+                        <h6 class="mb-1">{{ $budgetDurationDays > 0 ? max(0, $activeTarget->end_date->diffInDays(now())) : 0 }} days left</h6>
                         <small class="text-muted">{{ $activeTarget->start_date->format('M d') }} - {{ $activeTarget->end_date->format('M d') }}</small>
                     </div>
                 </div>
@@ -613,7 +558,7 @@
             </div>
             <div class="card-body text-center">
                 @if($budgetActive)
-                    @if($user->isOverspending())
+                    @if($budgetTone === 'danger')
                         <div class="mood-emoji display-4 mb-2">😰</div>
                         <h6 class="text-danger">Wallet Panic!</h6>
                     @elseif($budgetProgress >= 85)
@@ -877,9 +822,9 @@
 
                 const vibeKey = 'budget-vibe-{{ auth()->id() }}-{{ now()->format("Ymd") }}-{{ (int) $budgetProgress }}';
                 if (!sessionStorage.getItem(vibeKey)) {
-                    @if($user->isOverspending())
+                    @if($budgetTone === 'danger')
                         showBudgetToast('You are above budget. Wallet says: "emergency snacks cancelled."', 'danger', 'bi-emoji-dizzy');
-                    @elseif($budgetProgress >= 85 || $user->budgetDaysRemaining() <= 3)
+                    @elseif($budgetProgress >= 85)
                         showBudgetToast('Almost there! Tiny spending choices can save the month.', 'warning', 'bi-emoji-neutral');
                     @else
                         showBudgetToast('Amazing control! Your budget discipline deserves a high-five.', 'good', 'bi-emoji-sunglasses');
@@ -923,8 +868,8 @@
                             datasets: [{
                                 data: [{{ $budgetSpent }}, {{ max(0, $activeTarget->target_amount - $budgetSpent) }}],
                                 backgroundColor: [
-                                    '{{ $user->isOverspending() ? '#ef4444' : '#dc3545' }}',
-                                    '{{ $user->isOverspending() ? '#7f1d1d' : '#198754' }}'
+                                    '{{ $budgetTone === 'danger' ? '#ef4444' : '#dc3545' }}',
+                                    '{{ $budgetTone === 'danger' ? '#7f1d1d' : '#198754' }}'
                                 ],
                             }],
                         },
@@ -937,7 +882,7 @@
                     });
                 }
 
-                if (progressCtx && {{ $user->isOverspending() ? 'true' : 'false' }}) {
+                if (progressCtx && {{ $budgetTone === 'danger' ? 'true' : 'false' }}) {
                     const parent = progressCtx.parentElement;
                     const downCanvas = document.createElement('canvas');
                     downCanvas.height = 80;
