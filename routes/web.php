@@ -105,7 +105,7 @@ Route::get('/debug', function () {
     }
 });
 
-Route::middleware('guest')->group(function () {
+Route::middleware(['guest', 'database.ready'])->group(function () {
     Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [AuthController::class, 'register'])->name('register.perform');
 
