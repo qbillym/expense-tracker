@@ -71,11 +71,9 @@ Route::get('/debug', function () {
         
         // Test database connection
         try {
-            $tables = \DB::select("SHOW TABLES");
+            $tables = \DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
             foreach ($tables as $table) {
-                foreach ($table as $value) {
-                    $debug['tables'][] = $value;
-                }
+                $debug['tables'][] = $table->table_name;
             }
         } catch (\Exception $e) {
             $debug['database_status'] = 'error: ' . $e->getMessage();
