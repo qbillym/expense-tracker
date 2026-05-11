@@ -23,18 +23,27 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        try {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        Auth::login($user);
+            Auth::login($user);
 
-        // Log registration activity
-        ActivityLog::log($user->id, 'user_registered', 'New user account created');
+            // Log registration activity (with error handling)
+            try {
+                ActivityLog::log($user->id, 'user_registered', 'New user account created');
+            } catch (\Exception $e) {
+                \Log::error('Activity logging failed during registration: ' . $e->getMessage());
+            }
 
-        return redirect()->route('dashboard');
+            return redirect()->route('dashboard');
+        } catch (\Exception $e) {
+            \Log::error('Registration failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Registration failed. Please try again.'])->withInput();
+        }
     }
 
     public function showLoginForm()
@@ -56,8 +65,12 @@ class AuthController extends Controller
                 Auth::login($admin);
                 $request->session()->regenerate();
                 
-                // Log admin login activity
-                ActivityLog::log($admin->id, 'admin_login', 'Admin logged in to system');
+                // Log admin login activity (with error handling)
+                try {
+                    ActivityLog::log($admin->id, 'admin_login', 'Admin logged in to system');
+                } catch (\Exception $e) {
+                    \Log::error('Activity logging failed during admin login: ' . $e->getMessage());
+                }
                 
                 return redirect()->route('admin.dashboard');
             }
@@ -70,8 +83,12 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
-        // Log login activity
-        ActivityLog::log($user->id, 'user_login', 'User logged in to system');
+        // Log login activity (with error handling)
+        try {
+            ActivityLog::log($user->id, 'user_login', 'User logged in to system');
+        } catch (\Exception $e) {
+            \Log::error('Activity logging failed during user login: ' . $e->getMessage());
+        }
 
         // Redirect admin users to admin dashboard
         if ($user->is_admin) {
@@ -90,9 +107,13 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Log logout activity
+        // Log logout activity (with error handling)
         if ($user) {
-            ActivityLog::log($user->id, 'user_logout', 'User logged out from system');
+            try {
+                ActivityLog::log($user->id, 'user_logout', 'User logged out from system');
+            } catch (\Exception $e) {
+                \Log::error('Activity logging failed during logout: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('login');

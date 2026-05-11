@@ -42,16 +42,35 @@ class ActivityLog extends Model
      */
     public static function log($userId, $action, $description = null, $subject = null, $oldValues = null, $newValues = null)
     {
-        return static::create([
-            'user_id' => $userId,
-            'action' => $action,
-            'description' => $description,
-            'subject_type' => $subject ? get_class($subject) : null,
-            'subject_id' => $subject ? $subject->id : null,
-            'old_values' => $oldValues,
-            'new_values' => $newValues,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ]);
+        try {
+            $data = [
+                'user_id' => $userId,
+                'action' => $action,
+                'description' => $description,
+                'subject_type' => $subject ? get_class($subject) : null,
+                'subject_id' => $subject ? $subject->id : null,
+                'old_values' => $oldValues,
+                'new_values' => $newValues,
+            ];
+
+            // Safely get request context
+            try {
+                $data['ip_address'] = request()->ip();
+            } catch (\Exception $e) {
+                $data['ip_address'] = null;
+            }
+
+            try {
+                $data['user_agent'] = request()->userAgent();
+            } catch (\Exception $e) {
+                $data['user_agent'] = null;
+            }
+
+            return static::create($data);
+        } catch (\Exception $e) {
+            // Log the error but don't break the application
+            \Log::error('ActivityLog failed: ' . $e->getMessage());
+            return null;
+        }
     }
 }
