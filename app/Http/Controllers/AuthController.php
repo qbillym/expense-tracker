@@ -35,12 +35,12 @@ class AuthController extends Controller
             // Log registration activity (with error handling)
             try {
                 ActivityLog::log($user->id, 'user_registered', 'New user account created');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error('Activity logging failed during registration: ' . $e->getMessage());
             }
 
             return redirect()->route('dashboard');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Registration failed: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Registration failed. Please try again.'])->withInput();
         }
@@ -68,7 +68,7 @@ class AuthController extends Controller
                 // Log admin login activity (with error handling)
                 try {
                     ActivityLog::log($admin->id, 'admin_login', 'Admin logged in to system');
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::error('Activity logging failed during admin login: ' . $e->getMessage());
                 }
                 
@@ -86,7 +86,7 @@ class AuthController extends Controller
         // Log login activity (with error handling)
         try {
             ActivityLog::log($user->id, 'user_login', 'User logged in to system');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Activity logging failed during user login: ' . $e->getMessage());
         }
 
@@ -111,7 +111,7 @@ class AuthController extends Controller
         if ($user) {
             try {
                 ActivityLog::log($user->id, 'user_logout', 'User logged out from system');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error('Activity logging failed during logout: ' . $e->getMessage());
             }
         }

@@ -159,7 +159,7 @@ class User extends Authenticatable
             }
 
             return now()->diffInDays($this->activeBudgetTarget()->end_date, false);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return 0;
         }
     }
@@ -173,7 +173,7 @@ class User extends Authenticatable
             }
 
             return $activeTarget->start_date->diffInDays(now(), false);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return 0;
         }
     }
@@ -197,7 +197,7 @@ class User extends Authenticatable
             
             $activeTarget = $this->activeBudgetTarget();
             return $activeTarget ? $this->budgetSpent() > $activeTarget->target_amount : false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -243,7 +243,7 @@ class User extends Authenticatable
             return $this->expenses()
                 ->whereBetween('date', [$activeTarget->start_date->toDateString(), $activeTarget->end_date->toDateString()])
                 ->get();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return collect();
         }
     }
@@ -252,7 +252,7 @@ class User extends Authenticatable
     {
         try {
             return $this->budgetPeriodExpenses()->sum('amount');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return 0;
         }
     }
@@ -263,7 +263,7 @@ class User extends Authenticatable
             $activeTarget = $this->activeBudgetTarget();
             $targetAmount = $activeTarget ? (float) $activeTarget->target_amount : 0;
             return max(0, $targetAmount - $this->budgetSpent());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return 0;
         }
     }
@@ -277,7 +277,7 @@ class User extends Authenticatable
             }
 
             return min(100, (int) round(($this->budgetSpent() / $activeTarget->target_amount) * 100));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return 0;
         }
     }
@@ -294,7 +294,7 @@ class User extends Authenticatable
             }
 
             return $categoryTotals->sortDesc()->keys()->first();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

@@ -96,7 +96,7 @@ class DashboardController extends Controller
                                 $dashboardData['budgetChartLabels'] = $dashboardData['budgetCategories']->keys()->all();
                                 $dashboardData['budgetChartValues'] = $dashboardData['budgetCategories']->values()->map(fn($value) => (float) $value)->all();
                             }
-                        } catch (\Exception $budgetError) {
+                        } catch (\Throwable $budgetError) {
                             \Log::error('Budget calculation error: ' . $budgetError->getMessage());
                             $dashboardData['budgetActive'] = false;
                         }
@@ -107,14 +107,14 @@ class DashboardController extends Controller
                     $dashboardData['completedTargets'] = $user->completedBudgetTargets()->take(5)->get();
                 }
                 
-            } catch (\Exception $dataError) {
+            } catch (\Throwable $dataError) {
                 \Log::error('Dashboard data error: ' . $dataError->getMessage());
                 $dashboardData['error'] = 'Some data could not be loaded. Please try again later.';
             }
             
             return view('dashboard', $dashboardData);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log the error for debugging
             \Log::error('Dashboard Error: ' . $e->getMessage());
             
