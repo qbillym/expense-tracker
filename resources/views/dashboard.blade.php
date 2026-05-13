@@ -296,7 +296,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="h4 mb-1">Welcome back, {{ auth()->user()->name }}</h2>
+        <h2 class="h4 mb-1">Welcome back, {{ auth()->user()?->name ?? 'User' }}</h2>
         <p class="text-muted mb-0">Here's your expense overview</p>
     </div>
 </div>

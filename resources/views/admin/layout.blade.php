@@ -211,7 +211,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-badge me-1"></i>{{ Auth::user()->name }}
+                            <i class="bi bi-person-badge me-1"></i>{{ Auth::user()?->name ?? 'Admin' }}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">

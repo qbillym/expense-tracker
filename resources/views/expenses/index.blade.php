@@ -68,7 +68,7 @@
                     <a href="{{ route('reports.index') }}" class="btn btn-outline-success">
                         <i class="bi bi-download me-2"></i>Extract Records
                     </a>
-                    @if(!Auth::user()->is_admin)
+                    @if(!Auth::user()?->is_admin)
                     <a href="{{ route('expenses.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Add New Expense
                     </a>
@@ -82,7 +82,7 @@
                         <i class="bi bi-receipt display-1 text-muted mb-3"></i>
                         <h5 class="text-muted">No expenses found</h5>
                         <p class="text-muted mb-4">Start tracking your expenses by adding your first entry.</p>
-                        @if(!Auth::user()->is_admin)
+                        @if(!Auth::user()?->is_admin)
                         <a href="{{ route('expenses.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-2"></i>Add Your First Expense
                         </a>
@@ -137,7 +137,7 @@
                                     </div>
                                 @endif
 
-                                @if(!Auth::user()->is_admin)
+                                @if(!Auth::user()?->is_admin)
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil me-1"></i>Edit

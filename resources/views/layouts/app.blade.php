@@ -706,7 +706,7 @@
                 <ul class="navbar-nav me-auto">
                     @auth
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ Auth::user()->is_admin ? route('admin.dashboard') : route('dashboard') }}">
+                            <a class="nav-link" href="{{ Auth::user()?->is_admin ? route('admin.dashboard') : route('dashboard') }}">
                                 <i class="bi bi-house-door me-1"></i>Dashboard
                             </a>
                         </li>
@@ -715,7 +715,7 @@
                                 <i class="bi bi-receipt me-1"></i>Expenses
                             </a>
                         </li>
-                        @if(!Auth::user()->is_admin)
+                        @if(!Auth::user()?->is_admin)
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('expenses.create') }}">
                                 <i class="bi bi-plus-circle me-1"></i>Add Expense
@@ -734,10 +734,10 @@
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>{{ Auth::user()->name }}
+                                <i class="bi bi-person-circle me-1"></i>{{ Auth::user()?->name ?? 'User' }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ Auth::user()->is_admin ? route('admin.dashboard') : route('dashboard') }}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ Auth::user()?->is_admin ? route('admin.dashboard') : route('dashboard') }}">Dashboard</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">

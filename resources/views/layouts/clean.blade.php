@@ -176,7 +176,7 @@
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>{{ Auth::user()->name }}
+                                <i class="bi bi-person-circle me-1"></i>{{ Auth::user()?->name ?? 'User' }}
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
